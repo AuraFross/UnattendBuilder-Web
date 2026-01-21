@@ -1,0 +1,67 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Partition Style</MudText>
+        <MudRadioGroup T="string" SelectedOption="ConfigService.Config.PartitionStyle" SelectedOptionChanged="OnPartitionStyleChanged">
+            <MudRadio T="string" Option="@("GPT")" Color="Color.Primary">
+                GPT (UEFI) - Recommended for modern systems
+            </MudRadio>
+            <MudRadio T="string" Option="@("MBR")" Color="Color.Primary">
+                MBR (Legacy BIOS) - For older systems
+            </MudRadio>
+        </MudRadioGroup>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudCheckBox T="bool"
+                     Checked="ConfigService.Config.AutoPartition"
+                     CheckedChanged="OnAutoPartitionChanged"
+                     Label="Auto-partition disk (will wipe entire disk 0)"
+                     Color="Color.Primary" />
+    </MudItem>
+
+    @if (ConfigService.Config.AutoPartition && ConfigService.Config.PartitionStyle == "GPT")
+    {
+        <MudItem xs="12" md="6">
+            <MudNumericField T="int"
+                             Label="EFI Partition Size (MB)"
+                             @bind-Value="ConfigService.Config.EfiPartitionSize"
+                             Variant="Variant.Outlined"
+                             Min="100"
+                             Max="1000"
+                             HelperText="Recommended: 300 MB" />
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudNumericField T="int"
+                             Label="Recovery Partition Size (MB)"
+                             @bind-Value="ConfigService.Config.RecoveryPartitionSize"
+                             Variant="Variant.Outlined"
+                             Min="500"
+                             Max="5000"
+                             HelperText="Recommended: 1000 MB" />
+        </MudItem>
+    }
+
+    <MudItem xs="12">
+        <MudAlert Severity="Severity.Warning" Icon="@Icons.Material.Filled.Warning">
+            <MudText Typo="Typo.body2">
+                <strong>Warning:</strong> Auto-partition will completely erase all data on the target disk.
+                Make sure to back up any important data before running the installation.
+            </MudText>
+        </MudAlert>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private void OnPartitionStyleChanged(string value)
+    {
+        ConfigService.Config.PartitionStyle = value;
+    }
+
+    private void OnAutoPartitionChanged(bool value)
+    {
+        ConfigService.Config.AutoPartition = value;
+    }
+}

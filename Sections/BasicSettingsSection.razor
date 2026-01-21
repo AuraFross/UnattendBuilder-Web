@@ -1,0 +1,109 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudSelect T="string" Label="Language" @bind-Value="ConfigService.Config.Language" Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@("en-US")">English (US)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("en-GB")">English (UK)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("de-DE")">German</MudSelectItem>
+            <MudSelectItem T="string" Value="@("fr-FR")">French</MudSelectItem>
+            <MudSelectItem T="string" Value="@("es-ES")">Spanish</MudSelectItem>
+            <MudSelectItem T="string" Value="@("it-IT")">Italian</MudSelectItem>
+            <MudSelectItem T="string" Value="@("pt-BR")">Portuguese (Brazil)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("ja-JP")">Japanese</MudSelectItem>
+            <MudSelectItem T="string" Value="@("zh-CN")">Chinese (Simplified)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("ko-KR")">Korean</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudSelect T="string" Label="Keyboard Layout" @bind-Value="ConfigService.Config.Keyboard" Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@("0409:00000409")">US English</MudSelectItem>
+            <MudSelectItem T="string" Value="@("0809:00000809")">UK English</MudSelectItem>
+            <MudSelectItem T="string" Value="@("0407:00000407")">German</MudSelectItem>
+            <MudSelectItem T="string" Value="@("040c:0000040c")">French</MudSelectItem>
+            <MudSelectItem T="string" Value="@("0c0a:0000040a")">Spanish</MudSelectItem>
+            <MudSelectItem T="string" Value="@("0410:00000410")">Italian</MudSelectItem>
+            <MudSelectItem T="string" Value="@("0416:00000416")">Portuguese (Brazil)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("0411:00000411")">Japanese</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudSelect T="string" Label="Time Zone" @bind-Value="ConfigService.Config.TimeZone" Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@("Eastern Standard Time")">Eastern Time (US)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Central Standard Time")">Central Time (US)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Mountain Standard Time")">Mountain Time (US)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Pacific Standard Time")">Pacific Time (US)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("GMT Standard Time")">GMT (London)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("W. Europe Standard Time")">Central European Time</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Tokyo Standard Time")">Japan Time</MudSelectItem>
+            <MudSelectItem T="string" Value="@("China Standard Time")">China Time</MudSelectItem>
+            <MudSelectItem T="string" Value="@("AUS Eastern Standard Time")">Australia Eastern</MudSelectItem>
+            <MudSelectItem T="string" Value="@("UTC")">UTC</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Computer Name</MudText>
+        <MudRadioGroup T="string" SelectedOption="_computerNameOption" SelectedOptionChanged="OnComputerNameOptionChanged">
+            <MudRadio T="string" Option="@("random")" Color="Color.Primary">Random (Windows generates)</MudRadio>
+            <MudRadio T="string" Option="@("custom")" Color="Color.Primary">Custom name</MudRadio>
+            <MudRadio T="string" Option="@("prompt")" Color="Color.Primary">Prompt during install</MudRadio>
+        </MudRadioGroup>
+    </MudItem>
+
+    @if (_computerNameOption == "custom")
+    {
+        <MudItem xs="12" md="6">
+            <MudTextField T="string"
+                          Label="Computer Name"
+                          @bind-Value="ConfigService.Config.ComputerName"
+                          Variant="Variant.Outlined"
+                          HelperText="Max 15 characters, no special characters" />
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private string _computerNameOption = "random";
+
+    protected override void OnInitialized()
+    {
+        if (ConfigService.Config.UseInteractiveComputerName)
+        {
+            _computerNameOption = "prompt";
+        }
+        else if (ConfigService.Config.ComputerName == "*")
+        {
+            _computerNameOption = "random";
+        }
+        else
+        {
+            _computerNameOption = "custom";
+        }
+    }
+
+    private void OnComputerNameOptionChanged(string option)
+    {
+        _computerNameOption = option;
+        switch (option)
+        {
+            case "random":
+                ConfigService.Config.ComputerName = "*";
+                ConfigService.Config.UseInteractiveComputerName = false;
+                break;
+            case "prompt":
+                ConfigService.Config.ComputerName = "";
+                ConfigService.Config.UseInteractiveComputerName = true;
+                break;
+            case "custom":
+                ConfigService.Config.UseInteractiveComputerName = false;
+                if (ConfigService.Config.ComputerName == "*" || string.IsNullOrEmpty(ConfigService.Config.ComputerName))
+                {
+                    ConfigService.Config.ComputerName = "WORKSTATION";
+                }
+                break;
+        }
+    }
+}

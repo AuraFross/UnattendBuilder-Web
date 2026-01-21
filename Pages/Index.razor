@@ -1,0 +1,94 @@
+@page "/"
+@inject ConfigurationService ConfigService
+@inject IJSRuntime JS
+@inject ISnackbar Snackbar
+
+<PageTitle>Windows Unattend.xml Generator</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Configure Windows Installation</MudText>
+<MudText Typo="Typo.body1" Class="mb-6" Color="Color.Secondary">
+    Fill out the sections below to generate a customized autounattend.xml file for automated Windows installations.
+</MudText>
+
+<MudExpansionPanels MultiExpansion="true">
+    <MudExpansionPanel Text="Basic Settings" IsInitiallyExpanded="true" Icon="@Icons.Material.Filled.Settings">
+        <BasicSettingsSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="User Accounts" Icon="@Icons.Material.Filled.People">
+        <UserAccountsSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Disk Partitioning" Icon="@Icons.Material.Filled.Storage">
+        <DiskPartitioningSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Driver Injection" Icon="@Icons.Material.Filled.Memory">
+        <DriverInjectionSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Windows Edition" Icon="@Icons.Material.Filled.Window">
+        <WindowsEditionSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="System Tweaks" Icon="@Icons.Material.Filled.Tune">
+        <SystemTweaksSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Power Settings" Icon="@Icons.Material.Filled.BatteryChargingFull">
+        <PowerSettingsSection />
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="BitLocker" Icon="@Icons.Material.Filled.Lock">
+        <BitLockerSection />
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+<MudPaper Class="pa-4 mt-6" Elevation="2">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ResetForm" StartIcon="@Icons.Material.Filled.Refresh">
+            Reset All
+        </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" OnClick="GenerateXml" StartIcon="@Icons.Material.Filled.Download">
+            Generate XML
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    protected override void OnInitialized()
+    {
+        ConfigService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ConfigService.OnChange -= StateHasChanged;
+    }
+
+    private async Task GenerateXml()
+    {
+        var warnings = ConfigService.GetWarnings();
+        foreach (var warning in warnings)
+        {
+            Snackbar.Add(warning, Severity.Warning);
+        }
+
+        try
+        {
+            var xml = ConfigService.GenerateXml();
+            await JS.InvokeVoidAsync("downloadFileFromText", "autounattend.xml", xml);
+            Snackbar.Add("XML file generated and downloaded!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error generating XML: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void ResetForm()
+    {
+        ConfigService.Reset();
+        Snackbar.Add("Form reset to defaults", Severity.Info);
+    }
+}

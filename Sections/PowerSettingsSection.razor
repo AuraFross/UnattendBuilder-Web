@@ -1,0 +1,28 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudCheckBox T="bool"
+                     Checked="ConfigService.Config.ConfigureHighPerformancePower"
+                     CheckedChanged="@((bool v) => ConfigService.Config.ConfigureHighPerformancePower = v)"
+                     Label="Enable High Performance Power Plan"
+                     Color="Color.Primary" />
+    </MudItem>
+
+    @if (ConfigService.Config.ConfigureHighPerformancePower)
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">
+                <MudText Typo="Typo.body2">
+                    This will:
+                </MudText>
+                <ul class="mt-2">
+                    <li>Set the power plan to High Performance</li>
+                    <li>Disable disk sleep timeout</li>
+                    <li>Disable system standby timeout</li>
+                    <li>Set monitor timeout to 45 minutes</li>
+                </ul>
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>

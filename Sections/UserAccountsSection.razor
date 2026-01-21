@@ -1,0 +1,121 @@
+@inject ConfigurationService ConfigService
+
+<MudStack Spacing="4">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <MudText Typo="Typo.subtitle1">User Accounts (@ConfigService.Config.UserAccounts.Count)</MudText>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Primary"
+                   OnClick="AddAccount"
+                   StartIcon="@Icons.Material.Filled.PersonAdd"
+                   Disabled="@(ConfigService.Config.UserAccounts.Count >= 5)">
+            Add Account
+        </MudButton>
+    </MudStack>
+
+    @if (ConfigService.Config.UserAccounts.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">
+            No user accounts configured. Windows will prompt you to create accounts during installation.
+        </MudAlert>
+    }
+    else
+    {
+        @for (int i = 0; i < ConfigService.Config.UserAccounts.Count; i++)
+        {
+            var index = i;
+            var account = ConfigService.Config.UserAccounts[i];
+
+            <MudPaper Class="pa-4" Elevation="1">
+                <MudGrid>
+                    <MudItem xs="12" md="4">
+                        <MudTextField T="string"
+                                      Label="Username"
+                                      @bind-Value="account.Username"
+                                      Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField T="string"
+                                      Label="Password"
+                                      @bind-Value="account.Password"
+                                      InputType="@(_showPasswords[index] ? InputType.Text : InputType.Password)"
+                                      Variant="Variant.Outlined"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@(_showPasswords[index] ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                      OnAdornmentClick="@(() => TogglePasswordVisibility(index))" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <MudCheckBox T="bool" Checked="account.IsAdmin" CheckedChanged="@((bool v) => account.IsAdmin = v)" Label="Administrator" Color="Color.Primary" />
+                            <MudSpacer />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           OnClick="@(() => RemoveAccount(index))" />
+                        </MudStack>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }
+
+        <MudCheckBox T="bool"
+                     Checked="ConfigService.Config.AutoLogin"
+                     CheckedChanged="@((bool v) => ConfigService.Config.AutoLogin = v)"
+                     Label="Enable auto-login for first user"
+                     Color="Color.Primary" />
+    }
+</MudStack>
+
+@code {
+    private List<bool> _showPasswords = new();
+
+    protected override void OnInitialized()
+    {
+        ConfigService.OnChange += OnConfigChanged;
+        SyncPasswordVisibilityList();
+    }
+
+    private void OnConfigChanged()
+    {
+        SyncPasswordVisibilityList();
+        StateHasChanged();
+    }
+
+    private void SyncPasswordVisibilityList()
+    {
+        while (_showPasswords.Count < ConfigService.Config.UserAccounts.Count)
+        {
+            _showPasswords.Add(false);
+        }
+        while (_showPasswords.Count > ConfigService.Config.UserAccounts.Count)
+        {
+            _showPasswords.RemoveAt(_showPasswords.Count - 1);
+        }
+    }
+
+    private void AddAccount()
+    {
+        ConfigService.AddUserAccount();
+        _showPasswords.Add(false);
+    }
+
+    private void RemoveAccount(int index)
+    {
+        ConfigService.RemoveUserAccount(index);
+        if (index < _showPasswords.Count)
+        {
+            _showPasswords.RemoveAt(index);
+        }
+    }
+
+    private void TogglePasswordVisibility(int index)
+    {
+        if (index < _showPasswords.Count)
+        {
+            _showPasswords[index] = !_showPasswords[index];
+        }
+    }
+
+    public void Dispose()
+    {
+        ConfigService.OnChange -= OnConfigChanged;
+    }
+}

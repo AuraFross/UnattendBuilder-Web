@@ -1,0 +1,116 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudCheckBox T="bool"
+                     Checked="ConfigService.Config.EnableBitLocker"
+                     CheckedChanged="OnEnableBitLockerChanged"
+                     Label="Enable BitLocker Drive Encryption"
+                     Color="Color.Primary" />
+    </MudItem>
+
+    @if (ConfigService.Config.EnableBitLocker)
+    {
+        <MudItem xs="12" md="6">
+            <MudTextField T="string"
+                          Label="Drive Letter"
+                          @bind-Value="ConfigService.Config.BitLockerDriveLetter"
+                          Variant="Variant.Outlined"
+                          HelperText="Drive to encrypt (e.g., C:)" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudText Typo="Typo.subtitle2" Class="mb-2">Protection Method</MudText>
+            <MudRadioGroup T="string" SelectedOption="ConfigService.Config.BitLockerProtectionMethod" SelectedOptionChanged="OnProtectionMethodChanged">
+                <MudRadio T="string" Option="@("TPMOnly")" Color="Color.Primary">
+                    <MudStack Spacing="0">
+                        <MudText>TPM Only</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Uses TPM chip for automatic unlock. Most convenient.
+                        </MudText>
+                    </MudStack>
+                </MudRadio>
+                <MudRadio T="string" Option="@("TPMAndPIN")" Color="Color.Primary">
+                    <MudStack Spacing="0">
+                        <MudText>TPM + PIN</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Requires PIN at boot. More secure than TPM only.
+                        </MudText>
+                    </MudStack>
+                </MudRadio>
+                <MudRadio T="string" Option="@("PasswordOnly")" Color="Color.Primary">
+                    <MudStack Spacing="0">
+                        <MudText>Password Only (No TPM)</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            For systems without TPM. User enters password at boot.
+                        </MudText>
+                    </MudStack>
+                </MudRadio>
+            </MudRadioGroup>
+        </MudItem>
+
+        @if (ConfigService.Config.BitLockerProtectionMethod == "TPMAndPIN")
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField T="string"
+                              Label="BitLocker PIN"
+                              @bind-Value="ConfigService.Config.BitLockerPIN"
+                              InputType="InputType.Password"
+                              Variant="Variant.Outlined"
+                              HelperText="Leave empty to prompt during setup" />
+            </MudItem>
+        }
+
+        <MudItem xs="12">
+            <MudText Typo="Typo.subtitle2" Class="mb-2">Recovery Key Storage</MudText>
+            <MudRadioGroup T="string" SelectedOption="ConfigService.Config.BitLockerRecoveryOption" SelectedOptionChanged="OnRecoveryOptionChanged">
+                <MudRadio T="string" Option="@("FilePath")" Color="Color.Primary">
+                    Save to file path
+                </MudRadio>
+                <MudRadio T="string" Option="@("USB")" Color="Color.Primary">
+                    Save to USB drive
+                </MudRadio>
+                <MudRadio T="string" Option="@("Skip")" Color="Color.Primary">
+                    Skip recovery key backup
+                </MudRadio>
+            </MudRadioGroup>
+        </MudItem>
+
+        @if (ConfigService.Config.BitLockerRecoveryOption == "FilePath")
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField T="string"
+                              Label="Recovery Key Path"
+                              @bind-Value="ConfigService.Config.BitLockerRecoveryPath"
+                              Variant="Variant.Outlined"
+                              HelperText="Folder to save the recovery key file" />
+            </MudItem>
+        }
+
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Warning">
+                <MudText Typo="Typo.body2">
+                    <strong>Important:</strong> Always save your BitLocker recovery key in a safe location.
+                    Without the recovery key, data on the encrypted drive cannot be recovered if there are issues.
+                </MudText>
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private void OnEnableBitLockerChanged(bool value)
+    {
+        ConfigService.Config.EnableBitLocker = value;
+    }
+
+    private void OnProtectionMethodChanged(string value)
+    {
+        ConfigService.Config.BitLockerProtectionMethod = value;
+    }
+
+    private void OnRecoveryOptionChanged(string value)
+    {
+        ConfigService.Config.BitLockerRecoveryOption = value;
+    }
+}

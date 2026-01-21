@@ -1,0 +1,132 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudSelect T="string"
+                   Label="Windows Edition"
+                   Value="ConfigService.Config.Edition"
+                   ValueChanged="OnEditionChanged"
+                   Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@("Pro")">Windows Pro</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Home")">Windows Home</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Education")">Windows Education</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Enterprise")">Windows Enterprise</MudSelectItem>
+            <MudSelectItem T="string" Value="@("LTSC")">Windows Enterprise LTSC</MudSelectItem>
+            <MudSelectItem T="string" Value="@("IoT LTSC")">Windows IoT Enterprise LTSC</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Product Key Type</MudText>
+        <MudRadioGroup T="string" SelectedOption="_keyType" SelectedOptionChanged="OnKeyTypeChanged">
+            <MudRadio T="string" Option="@("generic")" Color="Color.Primary">
+                <MudStack Spacing="0">
+                    <MudText>Generic Retail Key</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        Pre-populated key for installation. Requires activation later.
+                    </MudText>
+                </MudStack>
+            </MudRadio>
+            <MudRadio T="string" Option="@("kms")" Color="Color.Primary">
+                <MudStack Spacing="0">
+                    <MudText>KMS Client Key</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        For organizations with a KMS server. Auto-activates on network.
+                    </MudText>
+                </MudStack>
+            </MudRadio>
+            <MudRadio T="string" Option="@("custom")" Color="Color.Primary">
+                <MudStack Spacing="0">
+                    <MudText>Custom Key (Enter Later)</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        Uses placeholder. You must edit the XML with your key.
+                    </MudText>
+                </MudStack>
+            </MudRadio>
+        </MudRadioGroup>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudTextField T="string"
+                      Label="Product Key"
+                      Value="@ConfigService.Config.ProductKey"
+                      Variant="Variant.Outlined"
+                      ReadOnly="true"
+                      HelperText="@GetKeyHelperText()" />
+    </MudItem>
+
+    @if (_keyType == "custom")
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Warning">
+                <MudText Typo="Typo.body2">
+                    <strong>Important:</strong> Before using the generated XML, open it in a text editor and replace
+                    <code>00000-00000-00000-00000-00000</code> with your actual product key.
+                </MudText>
+            </MudAlert>
+        </MudItem>
+    }
+
+    @if (_keyType == "kms")
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">
+                <MudText Typo="Typo.body2">
+                    Windows will automatically activate against your organization's KMS server when connected to the network.
+                </MudText>
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private string _keyType = "generic";
+
+    protected override void OnInitialized()
+    {
+        if (ConfigService.Config.UseKMSKey)
+        {
+            _keyType = "kms";
+        }
+        else if (ConfigService.Config.ProductKey == "00000-00000-00000-00000-00000")
+        {
+            _keyType = "custom";
+        }
+        else
+        {
+            _keyType = "generic";
+        }
+    }
+
+    private void OnEditionChanged(string edition)
+    {
+        ConfigService.Config.Edition = edition;
+        ConfigService.UpdateProductKey();
+    }
+
+    private void OnKeyTypeChanged(string keyType)
+    {
+        _keyType = keyType;
+        ConfigService.Config.UseKMSKey = keyType == "kms";
+
+        if (keyType == "custom")
+        {
+            ConfigService.Config.ProductKey = "00000-00000-00000-00000-00000";
+        }
+        else
+        {
+            ConfigService.UpdateProductKey();
+        }
+    }
+
+    private string GetKeyHelperText()
+    {
+        return _keyType switch
+        {
+            "generic" => "Generic retail key for the selected edition",
+            "kms" => "KMS client setup key for enterprise activation",
+            "custom" => "Placeholder - edit the XML with your actual key",
+            _ => ""
+        };
+    }
+}

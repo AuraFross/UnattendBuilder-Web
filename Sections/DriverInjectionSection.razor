@@ -1,0 +1,76 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudCheckBox T="bool"
+                     Checked="ConfigService.Config.EnableDriverInjection"
+                     CheckedChanged="OnEnableDriverInjectionChanged"
+                     Label="Enable driver injection during installation"
+                     Color="Color.Primary" />
+    </MudItem>
+
+    @if (ConfigService.Config.EnableDriverInjection)
+    {
+        <MudItem xs="12">
+            <MudText Typo="Typo.subtitle2" Class="mb-2">Injection Method</MudText>
+            <MudRadioGroup T="string" SelectedOption="ConfigService.Config.DriverInjectionMethod" SelectedOptionChanged="OnDriverMethodChanged">
+                <MudRadio T="string" Option="@("DriverPaths")" Color="Color.Primary">
+                    <MudStack Spacing="0">
+                        <MudText>DriverPaths (Specialize Pass)</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Installs drivers before first login. Best for critical drivers (storage, network).
+                        </MudText>
+                    </MudStack>
+                </MudRadio>
+                <MudRadio T="string" Option="@("pnputil")" Color="Color.Primary">
+                    <MudStack Spacing="0">
+                        <MudText>pnputil (First Logon)</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Copies drivers to local disk then installs. Use for optional drivers.
+                        </MudText>
+                    </MudStack>
+                </MudRadio>
+            </MudRadioGroup>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudTextField T="string"
+                          Label="Driver Source Path"
+                          @bind-Value="ConfigService.Config.DriverSourcePath"
+                          Variant="Variant.Outlined"
+                          HelperText="Path on USB/installation media (e.g., D:\Drivers)" />
+        </MudItem>
+
+        @if (ConfigService.Config.DriverInjectionMethod == "pnputil")
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField T="string"
+                              Label="Driver Target Path"
+                              @bind-Value="ConfigService.Config.DriverTargetPath"
+                              Variant="Variant.Outlined"
+                              HelperText="Local path where drivers will be copied (e.g., C:\Drivers)" />
+            </MudItem>
+        }
+
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">
+                <MudText Typo="Typo.body2">
+                    Place your driver folders (containing .inf files) in the source path on your installation media.
+                    The installer will automatically find and install all drivers recursively.
+                </MudText>
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private void OnEnableDriverInjectionChanged(bool value)
+    {
+        ConfigService.Config.EnableDriverInjection = value;
+    }
+
+    private void OnDriverMethodChanged(string value)
+    {
+        ConfigService.Config.DriverInjectionMethod = value;
+    }
+}

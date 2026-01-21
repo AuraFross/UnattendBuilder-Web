@@ -1,0 +1,100 @@
+@inject ConfigurationService ConfigService
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="2">
+            <MudCheckBox T="bool"
+                         Checked="ConfigService.Config.SetUACNeverNotify"
+                         CheckedChanged="@((bool v) => ConfigService.Config.SetUACNeverNotify = v)"
+                         Label="Set UAC to Never Notify"
+                         Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ml-8">
+                Disables UAC prompts. Not recommended for security.
+            </MudText>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="2">
+            <MudCheckBox T="bool"
+                         Checked="ConfigService.Config.ShowFileExtensions"
+                         CheckedChanged="@((bool v) => ConfigService.Config.ShowFileExtensions = v)"
+                         Label="Show File Extensions"
+                         Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ml-8">
+                Shows file extensions in Explorer (recommended).
+            </MudText>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="2">
+            <MudCheckBox T="bool"
+                         Checked="ConfigService.Config.EnableRDP"
+                         CheckedChanged="@((bool v) => ConfigService.Config.EnableRDP = v)"
+                         Label="Enable Remote Desktop"
+                         Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ml-8">
+                Enables RDP connections to this computer.
+            </MudText>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="2">
+            <MudCheckBox T="bool"
+                         Checked="ConfigService.Config.SetNLADelayedStart"
+                         CheckedChanged="@((bool v) => ConfigService.Config.SetNLADelayedStart = v)"
+                         Label="Set NLA to Delayed Start"
+                         Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ml-8">
+                Helps with network connectivity issues at login.
+            </MudText>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="2">
+            <MudCheckBox T="bool"
+                         Checked="ConfigService.Config.RemoveBloatware"
+                         CheckedChanged="@((bool v) => ConfigService.Config.RemoveBloatware = v)"
+                         Label="Remove Bloatware"
+                         Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ml-8">
+                Removes common pre-installed apps (Xbox, Solitaire, etc.)
+            </MudText>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudDivider Class="my-4" />
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudCheckBox T="bool"
+                     Checked="ConfigService.Config.InstallSoftware"
+                     CheckedChanged="@((bool v) => ConfigService.Config.InstallSoftware = v)"
+                     Label="Auto-install software from USB"
+                     Color="Color.Primary" />
+    </MudItem>
+
+    @if (ConfigService.Config.InstallSoftware)
+    {
+        <MudItem xs="12" md="6">
+            <MudTextField T="string"
+                          Label="Software Source Path"
+                          @bind-Value="ConfigService.Config.SoftwareSourcePath"
+                          Variant="Variant.Outlined"
+                          HelperText="Path containing .exe, .msi, or .ps1 installers" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">
+                <MudText Typo="Typo.body2">
+                    All executable files (.exe, .msi, .bat, .cmd, .ps1) in this folder will be run automatically
+                    after first login. MSI files run with /qn (silent), PS1 with bypass execution policy.
+                </MudText>
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>
