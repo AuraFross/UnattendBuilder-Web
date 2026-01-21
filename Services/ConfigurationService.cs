@@ -1,6 +1,6 @@
-using UnattendBuilder.Web.Models;
+using Windows_Key_Builder.Web.Models;
 
-namespace UnattendBuilder.Web.Services
+namespace Windows_Key_Builder.Web.Services
 {
     public class ConfigurationService
     {

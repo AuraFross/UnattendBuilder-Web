@@ -1,4 +1,4 @@
-# UnattendBuilder Web
+# Windows Key Builder
 
 A Blazor Server web application for generating Windows `autounattend.xml` files. This project is a web-based adaptation of the UnattendBuilder tool, running in a containerized environment.
 

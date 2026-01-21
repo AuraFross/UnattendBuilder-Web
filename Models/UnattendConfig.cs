@@ -1,4 +1,4 @@
-namespace UnattendBuilder.Web.Models
+namespace Windows_Key_Builder.Web.Models
 {
     public class UserAccount
     {
