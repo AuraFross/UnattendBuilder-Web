@@ -6,18 +6,45 @@ A web application for generating customized Windows `autounattend.xml` files. Th
 
 ## Preview
 
-![Application Screenshot](assets/Images%20FUll%20Page.PNG)
+![Full Application](assets/Full%20Page.PNG)
 
-## Features
+## Features & Gallery
 
-- **Web Interface**: Modern UI built with Blazor and MudBlazor.
-- **Docker Ready**: Fully containerized for easy deployment.
-- **Comprehensive Support**: Includes all Windows 11 languages, time zones, and keyboard layouts.
-- **Advanced Tweaks**:
-  - Bypass TPM 2.0 & RAM checks for older hardware.
-  - Automate disk partitioning.
-  - Create user accounts automatically.
-  - Debloat Windows by removing pre-installed apps.
+### 1. Basic Settings
+Configure language, time zone, and computer name. Includes comprehensive support for all Windows 11 regions.
+![Basic Settings](assets/basic.PNG)
+
+### 2. Disk Partitioning
+Automate disk formatting and partitioning (MBR/GPT) to ensure a clean install every time.
+![Disk Partitioning](assets/Disk%20Partitioning.PNG)
+
+### 3. Windows Edition & Key
+Select your edition (Pro, Home, Enterprise, etc.) and input product keys.
+![Windows Edition](assets/windows%20edition.PNG)
+
+### 4. User Accounts
+Pre-create local user accounts, set passwords, and enable auto-login.
+![User Accounts](assets/User%20Accounts.PNG)
+
+### 5. System Tweaks
+Customize the experience:
+- **Bypass TPM 2.0 & RAM Checks** (Install on older hardware)
+- Disable UAC
+- Enable RDP
+- Remove Bloatware
+![System Tweaks](assets/system%20tweaks.PNG)
+
+### 6. Power Settings
+Configure high-performance power plans and disable sleep/hibernate to keep the system running.
+![Power Settings](assets/Power%20Settings.PNG)
+
+### 7. Driver Injection
+Automatically install drivers from a USB drive during setup.
+![Driver Injection](assets/Driver%20Injection.PNG)
+
+### 8. BitLocker Encryption
+Enable BitLocker encryption automatically during the first login.
+![BitLocker](assets/Bitlocker.PNG)
 
 ## Getting Started
 
