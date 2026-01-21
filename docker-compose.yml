@@ -2,9 +2,15 @@ version: '3.8'
 
 services:
   unattendbuilder:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # Use the pre-built image from GitHub Container Registry
+    image: ghcr.io/aurafross/unattendbuilder-web:latest
+    container_name: unattendbuilder
+
+    # Optional: Keep build context for local development (commented out)
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+
     ports:
       - "5000:8080"
       - "5001:8081"
