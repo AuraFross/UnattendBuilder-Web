@@ -1,40 +1,36 @@
 # Windows Key Builder
 
-A Blazor Server web application for generating Windows `autounattend.xml` files. This project is a web-based adaptation of the UnattendBuilder tool, running in a containerized environment.
+A web application for generating customized Windows `autounattend.xml` files. This tool helps you create automated Windows installation media with ease.
+
+## Preview
+
+![Application Screenshot](assets/screenshot.png)
 
 ## Features
 
 - **Web Interface**: Modern UI built with Blazor and MudBlazor.
-- **Docker Ready**: Fully containerized with Docker support.
-- **XML Generation**: Generates valid Windows Answer Files for automated installation.
+- **Docker Ready**: Fully containerized for easy deployment.
+- **Comprehensive Support**: Includes all Windows 11 languages, time zones, and keyboard layouts.
+- **Advanced Tweaks**:
+  - Bypass TPM 2.0 & RAM checks for older hardware.
+  - Automate disk partitioning.
+  - Create user accounts automatically.
+  - Debloat Windows by removing pre-installed apps.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Docker Desktop or Docker Engine
-- .NET 6.0 SDK (for local development)
 
-### Running with Docker
+### Deployment
 
-1. Build and run the container:
+1. Run the container using Docker Compose:
    ```bash
-   docker-compose up -d --build
+   docker-compose up -d
    ```
 
-2. Access the application at `http://localhost:8082` or `http://<server-ip>:8082` (or the port defined in docker-compose.yml).
-
-### Local Development
-
-1. Restore dependencies:
-   ```bash
-   dotnet restore
-   ```
-
-2. Run the application:
-   ```bash
-   dotnet run
-   ```
+2. Access the application at `http://localhost:8082` or `http://<server-ip>:8082`.
 
 ## Tech Stack
 
